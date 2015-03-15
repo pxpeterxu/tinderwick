@@ -7,7 +7,9 @@ angular.module('users').controller('AuthenticationController', [
 		$scope.credentials = {};
 
 		// If user is signed in then redirect back home
-		if ($scope.authentication.authToken) $location.path('/');
+		if ($scope.authentication.authToken) {
+      $location.path('/home');
+    }
 
 		$scope.signin = function() {
 			$scope.isProcessing = true;
