@@ -21,7 +21,7 @@ angular.module('users').controller('AuthenticationController', [
 						content: 'Signed in!',
 						class: 'success'
 					});
-					$location.path('/');
+					$location.path('/home');
 				},
 				function failure(error) {
 					$scope.isProcessing = false;
