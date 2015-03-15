@@ -1,0 +1,52 @@
+<section class="row" data-ng-controller="SettingsController">
+	<div data-ng-if="profile" class="col-sm-4 col-sm-offset-4 col-xs-10 col-xs-offset-1">
+		<h3 class="col-md-12 text-center">Edit your profile</h3>
+		<form name="userForm" data-ng-submit="save(userForm.$valid)" class="form-horizontal" autocomplete="off" novalidate>
+			<div class="form-group">
+				<label>Name</label>
+				{{ profile.name }}
+			</div>
+			<div class="form-group">
+				<label for="minAge">Minimum match age</label>
+				<input type="number" id="minAge" name="minAge" class="form-control" data-ng-model="profile.age_filter_min">
+			</div>
+			<div class="form-group">
+				<label for="maxAge">Maximum match age</label>
+				<input type="number" id="maxAge" name="maxAge" class="form-control" data-ng-model="profile.age_filter_max">
+			</div>
+			<div class="form-group">
+				<label for="distance">Radius of matches (mi.)</label>
+				<input type="number" id="distance" name="distance" class="form-control" data-ng-model="profile.distance_filter">
+			</div>
+			<div class="form-group">
+				<label for="gender">Gender</label>
+				<select name="gender" id="gender" class="form-control"
+						data-ng-model="profile.gender"
+						data-ng-options="entry.value as entry.label for entry in genderOptions"></select>
+			</div>
+			<div class="form-group">
+				<label>Interested in</label><br>
+				<input id="interestedInMen" type="checkbox" value="1"
+					   data-ng-model="profile.interestedInMen">
+				<label for="interestedInMen">Men</label>
+				
+				<input id="interestedInWomen" type="checkbox" value="1"
+					   data-ng-model="profile.interestedInWomen">
+				<label for="interestedInWomen">Women</label>
+			</div>
+			<div class="form-group">
+				<label for="bio">Bio</label>
+				<textarea id="distance" name="distance" class="form-control" data-ng-model="profile.bio"></textarea>
+			</div>
+			<div class="text-center form-group">
+				<button type="submit" class="btn btn-large btn-primary">Save Profile</button>
+			</div>
+			<div data-ng-show="success" class="text-center text-success">
+				<strong>Profile Saved Successfully</strong>
+			</div>
+			<div data-ng-show="error" class="text-center text-danger">
+				<strong data-ng-bind="error"></strong>
+			</div>
+		</form>
+	</div>
+</section>

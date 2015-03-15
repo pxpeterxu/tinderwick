@@ -1,0 +1,26 @@
+<div class="popover matches-popover">
+	<div class="arrow"></div>
+	<div class="popover-content">
+		<table class="match-table">
+			<tr data-ng-repeat="match in lastUpdate.matches | orderBy:'-last_activity_date'"
+			data-ng-click="setCurMatch(match)">
+				<td><div class="profile-pic-thumbnail"><img ng-src="{{match.person.photos[0].processedFiles[3].url}}"></div></td>
+
+				<td ng-init="latestMessage = match.messages[match.messages.length - 1]">
+					{{match.person.name}}<br>
+					<div ng-if="match.messages.length !== 0" class="gray-text message-preview">
+						<em ng-show="latestMessage.from === match.person._id">{{ match.person.name }}:</em>
+						<em ng-show="latestMessage.from !== match.person._id">You:</em>
+						{{latestMessage.message}}
+					</div>
+					<span data-am-time-ago="match.last_activity_date" class="small gray-text"></span>
+				</td>
+			</tr>
+		</table>
+				
+		<!-- If no matches -->
+		<div data-ng-if="!lastUpdate.matches || lastUpdate.matches.length === 0" class="text-center">
+			You have no matches yet. <a href="#!/">Swipe more people to get more matches!</a>
+		</div>
+	</div>
+</div>

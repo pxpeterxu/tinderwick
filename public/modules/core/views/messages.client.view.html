@@ -1,0 +1,74 @@
+<section data-ng-controller="MessagesController">
+	<div class="row" ng-show="data">
+		<div ng-class="{ 'col-sm-12': !curMatch, 'col-sm-8': curMatch }">
+			<h1>Messages</h1>
+			<p class="gray-text">Showing activity since <strong>{{data.last_activity_date | amDateFormat:'MMMM D, YYYY h:mm a'}}</strong></p>
+
+			<table class="table table-hover match-table">
+				<thead>
+					<tr>
+						<th>Match</th>
+						<th>Last updated</th>
+						<th>Latest message</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-repeat="match in data.matches | orderBy:'-last_activity_date'"
+						data-ng-click="setCurMatch(match)">
+
+						<td><div class="profile-pic-thumbnail"><img ng-src="{{match.person.photos[0].processedFiles[3].url}}">{{match.person.name}}</div></td>
+						<td><span data-am-time-ago="match.last_activity_date"></span></td>
+						<td>
+							<span ng-if="match.messages.length !== 0">
+								<em ng-show="match.messages[match.messages.length - 1].from === match.person._id" class="gray-text">{{ match.person.name }}:</em>
+								<em ng-show="match.messages[match.messages.length - 1].from !== match.person._id" class="gray-text">You:</em>
+								{{match.messages[match.messages.length - 1].message}}
+							</span>
+						</td>
+					</tr>
+					
+					<!-- If no matches -->
+					<tr data-ng-if="!data.matches || data.matches.length === 0">
+						<td colspan="3" class="text-center">
+							You have no matches yet. <a href="#!/">Swipe more people to get more matches!</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<!-- Messaging panel -->
+		<div class="col-sm-4" ng-if="curMatch">
+			<div class="panel panel-default">
+				<div class="panel-heading match-profile">
+					<a ng-href="#!/user/{{curMatch.person._id}}"><img ng-src="{{curMatch.person.photos[0].processedFiles[3].url}}"><a>
+					<h4><a ng-href="#!/user/{{curMatch.person._id}}">{{curMatch.person.name}}</a></h4>
+				</div>
+				
+				<div class="panel-body">
+					<div data-ng-repeat="message in curMatch.messages | orderBy:'sent_date'"
+					     data-ng-init="message.showDate = false"
+					     data-ng-click="message.showDate = !message.showDate"
+					     data-ng-class="{
+					       'message': true,
+					       'mine': curMatch.person._id !== message.from,
+					       'theirs': curMatch.person._id === message.from
+					     }">
+						<div class="bubble">{{message.message}}</div>
+						<div data-ng-if="message.showDate" class="message-date">{{message.sent_date | amDateFormat:'MMMM D, YYYY h:mm a'}}</div>
+					</div>
+					
+					<!-- Box for writing new messages -->
+					<div class="message mine">
+						<div class="bubble">
+							<textarea data-ng-model="curMatch.draftMessage"
+							          data-ng-keypress="messageKeyHandler($event)"
+												data-ng-disabled="curMatch.sendDisabled"
+							          class="form-control"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

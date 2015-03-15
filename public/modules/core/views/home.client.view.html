@@ -1,0 +1,50 @@
+<section data-ng-controller="HomeController">
+	<div class="row" data-ng-show="user">
+		<div class="col-sm-3">
+			<a class="btn btn-primary btn-block" data-ng-show="disableActions" data-ng-href="#!/">Back to recommendations</a>
+			<!--<a class="btn btn-primary btn-block" data-ng-show="disableActions && hasBack()" data-ng-click="back()">Back to conversations</a>-->
+			<h1>{{user.name}}, <small>{{user.age}}</small></h1>
+			<p class="gray-text">
+				{{user.distance_mi}} miles away<br>
+				Last active <span data-am-time-ago="user.ping_time"></span>
+			</p>
+			<div class="row like-buttons" data-ng-hide="disableActions">
+				<div class="col-xs-6 text-center">
+					<a href="" class="btn btn-danger" data-ng-click="pass()"><span class="glyphicon glyphicon-remove"></span></a>
+				</div>
+				<div class="col-xs-6 text-center">
+					<a href="" class="btn btn-success" data-ng-click="like()"><span class="glyphicon glyphicon-heart"></span></a>
+				</div>
+			</div>
+			<br>
+			<p class="bio">{{user.bio}}</p>
+			<hr>
+			<h4>Shared interests: <small>{{user.common_like_count}}</small></h4>
+			<table data-ng-repeat="item in common_likes" class="shared-item">
+				<tr>
+					<td><img data-ng-src="{{item.picture.data.url}}"></td>
+					<td>{{item.name}}</td>
+				</tr>
+			</table>
+			<hr>
+			<h4>Common friends: <small>{{user.common_friend_count}}</small></h4>
+			<table data-ng-repeat="item in common_friends" class="shared-item">
+				<tr>
+					<td><img data-ng-src="{{item.picture.data.url}}"></td>
+					<td>{{item.name}}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-6 main-photo">
+			<img data-ng-src="{{curPhoto.processedFiles[0].url}}" style="width: 100%">
+		</div>
+		<div class="col-sm-3 left-padding">
+			<a href=""
+			   data-ng-repeat="photo in user.photos"
+			   data-ng-click="setCurPhoto(photo)" class="thumbnail-photo">
+				<div>{{reverseKeyMap[$index]}}</div>
+				<img data-ng-src="{{photo.processedFiles[2].url}}">
+			</a>
+		</div>
+	</div>
+</section>

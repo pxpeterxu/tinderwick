@@ -1,0 +1,130 @@
+<div class="container" data-ng-controller="HeaderController" style="position: relative">
+	<div class="navbar-header">
+		<button class="navbar-toggle" type="button" data-ng-click="toggleCollapsibleMenu()">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<a href="/#!/" class="navbar-brand"><img src="/img/logo.png"> tinderwick</a>
+	</div>
+	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
+		<ul class="nav navbar-nav" data-ng-if="menu.shouldRender(authentication.user);">
+			<li data-ng-repeat="item in menu.items | orderBy: 'position'" data-ng-if="item.shouldRender(authentication.user);" ng-switch="item.menuItemType" ui-route="{{item.uiRoute}}" class="{{item.menuItemClass}}" ng-class="{active: ($uiRoute)}" dropdown="item.menuItemType === 'dropdown'">
+				<a ng-switch-when="dropdown" class="dropdown-toggle">
+					<span data-ng-bind="item.title"></span>
+					<b class="caret"></b>
+				</a>
+				<ul ng-switch-when="dropdown" class="dropdown-menu">
+					<li data-ng-repeat="subitem in item.items | orderBy: 'position'" data-ng-if="subitem.shouldRender(authentication.user);" ui-route="{{subitem.uiRoute}}" ng-class="{active: $uiRoute}">
+						<a href="/#!/{{subitem.link}}" data-ng-bind="subitem.title"></a>
+					</li>
+				</ul>
+				<a ng-switch-default href="/#!/{{item.link}}" data-ng-bind="item.title"></a>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right" data-ng-hide="authentication.isLoggedIn()">
+			<li ui-route="/signin" ng-class="{active: $uiRoute}">
+				<a href="/#!/signin">Sign In</a>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.isLoggedIn()">
+			<li>
+				<!-- <a data-ng-href="#!/messages" data-ng-class="{ 'has-new-message': hasNewMessage }" data-ng-click="hasNewMessage = false"><span class="glyphicon glyphicon-envelope"></span></a> -->
+				<a href="" data-ng-class="{ 'has-new-message': hasNewMessage }"
+				   data-ng-click="messageButtonClicked($event)">
+				 <span class="glyphicon glyphicon-envelope"></span>
+				</a>
+			</li>
+			<li>
+				<a href="" data-ng-click="signOut()">Sign Out</a>
+			</li>
+			
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="/#!/settings">Change Tinder settings</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</nav>
+
+	<!-- Matches popover -->
+	<div class="matches-marker">
+		<div class="popover matches-popover" data-ng-show="showMatches"
+				 data-ng-click="$event.stopPropagation()">
+			<div class="popover-inner">
+				<div class="popover-content">
+						
+					<table class="match-table">
+						<tr data-ng-repeat="match in lastUpdate.matches | orderBy:'-last_activity_date'"
+						data-ng-click="setCurMatch(match)">
+							<td><div class="profile-pic-thumbnail"><img ng-src="{{match.person.photos[0].processedFiles[3].url}}"></div></td>
+
+							<td ng-init="latestMessage = match.messages[match.messages.length - 1]">
+								{{match.person.name}}<br>
+								<div ng-if="match.messages.length !== 0" class="gray-text message-preview">
+									<em ng-show="latestMessage.from === match.person._id">{{ match.person.name }}:</em>
+									<em ng-show="latestMessage.from !== match.person._id">You:</em>
+									{{latestMessage.message}}
+								</div>
+								<span data-am-time-ago="match.last_activity_date" class="small gray-text"></span>
+							</td>
+						</tr>
+					</table>
+							
+					<!-- If no matches -->
+					<div data-ng-if="!lastUpdate" class="text-center">Still loading! Check back in 5 seconds.</div>
+					<div data-ng-if="lastUpdate && (!lastUpdate.matches || lastUpdate.matches.length === 0)" class="text-center">
+						You have no matches yet. <strong>Swipe more people to get more matches!</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="messages-marker">
+		<div class="popover messages-popover" data-ng-show="curMatch">
+			<div class="popover-inner">
+				<div class="popover-title">
+					<button type="button" class="close" data-ng-click="curMatch = null"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<div class="profile-pic-thumbnail match-header">
+						<a data-ng-href="#!/user/{{curMatch.person._id}}">
+							<img data-ng-src="{{curMatch.person.photos[0].processedFiles[3].url}}">
+							{{curMatch.person.name}}
+						</a>
+					</div>
+				</div>
+				
+				<div scroll-glue class="popover-content">
+					<div data-ng-repeat="message in curMatch.messages | orderBy:'sent_date'"
+							 data-ng-init="message.showDate = false"
+							 data-ng-click="message.showDate = !message.showDate"
+							 data-ng-class="{
+								 'message': true,
+								 'mine': curMatch.person._id !== message.from,
+								 'theirs': curMatch.person._id === message.from
+							 }">
+						<div class="bubble">{{message.message}}</div>
+						<div data-ng-if="message.showDate" class="message-date">{{message.sent_date | amDateFormat:'MMMM D, YYYY h:mm a'}}</div>
+					</div>
+					
+					<!-- Box for writing new messages -->
+					<div class="message mine">
+						<div class="bubble">
+							<textarea data-ng-model="curMatch.draftMessage"
+												data-ng-keypress="messageKeyHandler($event);"
+												data-ng-keydown="$event.stopPropagation()"
+												data-ng-disabled="curMatch.sendDisabled"
+												class="form-control"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
